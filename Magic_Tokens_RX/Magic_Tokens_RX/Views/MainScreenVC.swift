@@ -17,4 +17,3 @@ class MainScreenVC: UIViewController {
         view.backgroundColor = .blue
     }
 }
-

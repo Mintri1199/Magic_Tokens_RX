@@ -1,0 +1,24 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'Magic_Tokens_RX' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for Magic_Tokens_RX
+  pod 'SwiftLint'
+  pod 'RxSwift', '~> 5'
+  pod 'RxCocoa', '~> 5'
+  
+  target 'Magic_Tokens_RXTests' do
+    inherit! :search_paths
+    # Pods for testing
+    pod 'RxBlocking', '~> 5'
+    pod 'RxTest', '~> 5'
+  end
+
+  target 'Magic_Tokens_RXUITests' do
+    # Pods for testing
+  end
+
+end

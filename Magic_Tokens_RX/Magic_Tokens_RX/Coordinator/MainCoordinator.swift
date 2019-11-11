@@ -14,15 +14,23 @@ protocol Coordinator {
     var navigationController: UINavigationController { get set }
     func start()
 }
+
 class MainCoordinator: Coordinator {
+    var childCoordinator: [Coordinator] = []
+    
     var navigationController: UINavigationController
     
-    var childCoordinator: [Coordinator] = []
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
     func start() {
         let vc = MainScreenVC()
+        vc.coordinator = self
+        navigationController.pushViewController(vc, animated: true)
+    }
+    
+    func createToken() {
+        let vc = TokenCreationVC()
         vc.coordinator = self
         navigationController.pushViewController(vc, animated: true)
     }

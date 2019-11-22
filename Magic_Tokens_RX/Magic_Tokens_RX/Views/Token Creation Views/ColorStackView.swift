@@ -16,7 +16,6 @@ enum ColorButtonAnimation: String {
 
 
 class ColorStackView: UIStackView {
-    
     private var selected = 0
     
     // MARK: - Custom UIs
@@ -62,6 +61,12 @@ class ColorStackView: UIStackView {
         addArrangedSubview(greenButton)
         addArrangedSubview(blackButton)
         addArrangedSubview(whiteButton)
+        
+        redButton.addTarget(self, action: #selector(colorButtonTapped(_:)), for: .touchUpInside)
+        blueButton.addTarget(self, action: #selector(colorButtonTapped(_:)), for: .touchUpInside)
+        greenButton.addTarget(self, action: #selector(colorButtonTapped(_:)), for: .touchUpInside)
+        blackButton.addTarget(self, action: #selector(colorButtonTapped(_:)), for: .touchUpInside)
+        whiteButton.addTarget(self, action: #selector(colorButtonTapped(_:)), for: .touchUpInside)
     }
 
     required init(coder: NSCoder) {
@@ -113,5 +118,4 @@ class ColorStackView: UIStackView {
             addColor(layer: buttonViews[index].layer)
         }
     }
-    
 }

@@ -13,7 +13,7 @@ enum AutoCompleteError: Error {
 }
 
 class PrefixTreeNode {
-    var data: String? = nil
+    var data: String?
     var children: [PrefixTreeNode?] = Array(repeating: nil, count: 26)
     
     func isEmpty() -> Bool {
@@ -22,7 +22,7 @@ class PrefixTreeNode {
     
     func numberOfChildren() -> Int {
         // Return the number of non nil children in the array
-        return children.reduce(0, { result, child in return child == nil ? result : result + 1})
+        return children.reduce(0, { result, child in return child == nil ? result : result + 1 })
     }
     
     func hasChild(_ char: Character) -> Bool {
@@ -55,7 +55,7 @@ class PrefixTreeNode {
 
 class PrefixTree {
     private let root: PrefixTreeNode = PrefixTreeNode()
-    
+    var size: Int = 0
     init(vocabulary: [String]=[]) {
         for word in vocabulary {
             self.insert(word: word)
@@ -68,8 +68,8 @@ class PrefixTree {
         
         // Loop through the word character by character
         for char in word.uppercased() {
-            // Skip this character for Assembly Worker
-            if char == "-" {
+            // Skip any non letter character
+            if !char.isLetter {
                 continue
             }
             
@@ -94,7 +94,7 @@ class PrefixTree {
         return self.root.isEmpty()
     }
     
-    func contains(word: String) -> Bool{
+    func contains(word: String) -> Bool {
         // Returns a boolean value to show whether the tree contains a word.
         if word.isEmpty {
             return true

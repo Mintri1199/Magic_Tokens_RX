@@ -10,8 +10,6 @@ import Foundation
 import UIKit
 
 struct NetworkManager {
-    static let environment: NetworkEnvironment = .production
-    private let scryfallRouter = Router<ScryfallAPI>()
     
     enum NetworkReponse: String, Error {
         case authenticationError = "You need to be authenticated first."
@@ -21,6 +19,9 @@ struct NetworkManager {
         case noData = "Response returned with no data to decode."
         case unableToDecode = "We could not decode the response."
     }
+    
+    static let environment: NetworkEnvironment = .production
+    private let scryfallRouter = Router<ScryfallAPI>()
     
     fileprivate func handleNetworkResponse( _ response: HTTPURLResponse) -> Result<String, NetworkReponse> {
         switch response.statusCode {
@@ -43,7 +44,10 @@ struct NetworkManager {
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
-                    guard let responseData = data  else { completion(.failure(.noData)); return }
+                    guard let responseData = data  else {
+                        completion(.failure(.noData))
+                        return
+                    }
                     
                     do {
                         var model = try JSONDecoder().decode(FilteredSetModel.self, from: responseData)
@@ -57,5 +61,37 @@ struct NetworkManager {
                 }
             }
         }
+    }
+    
+    func getAllCardsFromSet(searchURI: URL) {
+        let session = URLSession.shared
+        let request = URLRequest(url: searchURI)
+        
+        let task = session.dataTask(with: request) { (data, response, error) in
+            if error != nil {
+                print("Check your network connection")
+                return
+            }
+            if let response = response as? HTTPURLResponse {
+                switch self.handleNetworkResponse(response) {
+                case .success:
+                    guard let responseData = data  else {
+                        return
+                    }
+                    
+                    do {
+                        var apiResponse = try JSONDecoder().decode(CardFromSetModel.self, from: responseData)
+                        apiResponse.filterCreature()
+                        apiResponse.data.forEach { allCreatures.insert($0.name) }
+                        print(allCreatures.count)
+                    } catch {
+                        print("Fucky")
+                    }
+                case .failure(let networkFailureError):
+                    print(networkFailureError)
+                }
+            }
+        }
+        task.resume()
     }
 }

@@ -13,18 +13,21 @@ struct FilteredSetModel: Codable {
     private let fobbidenCodes: Set = ["phel", "gs1", "dd", "fnm", "po3", "tdag", "tddi", "tfth", "thp1", "thp2", "thp3", "te01"]
     
     mutating func filterSets() {
-        data = data.filter{ !fobbidenCodes.contains($0.code) && $0.setType == "token"}
+        data = data.filter { !fobbidenCodes.contains($0.code) && $0.setType == "token" }
     }
 }
 
 // Set Object
 struct SetObject: Codable {
-    let code, name, setType: String
-    
-    
     enum CodingKeys: String, CodingKey {
         case setType = "set_type"
+        case searchURI = "search_uri"
         case name
         case code
     }
+
+    let code: String
+    let name: String
+    let setType: String
+    let searchURI: URL
 }

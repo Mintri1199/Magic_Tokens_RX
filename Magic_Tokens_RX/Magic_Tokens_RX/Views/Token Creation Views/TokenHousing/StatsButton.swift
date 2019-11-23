@@ -22,6 +22,19 @@ class StatsButton: UIButton {
         }
     }
     
+    private let statsLabel: UILabel = {
+        var label = UILabel(frame: .zero)
+        label.text = "1/1"
+        label.textColor = .gray
+        label.backgroundColor = .clear
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont(name: "Helvetica", size: 40)
+        label.minimumScaleFactor = 0.2
+        label.adjustsFontSizeToFitWidth = true
+        return label
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         titleLabel?.allowsDefaultTighteningForTruncation = false
@@ -36,19 +49,6 @@ class StatsButton: UIButton {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private let statsLabel: UILabel = {
-        var label = UILabel(frame: .zero)
-        label.text = "1/1"
-        label.textColor = .gray
-        label.backgroundColor = .clear
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont(name: "Helvetica", size: 40)
-        label.minimumScaleFactor = 0.2
-        label.adjustsFontSizeToFitWidth = true
-        return label
-    }()
     
     private func setupLabel() {
         addSubview(statsLabel)

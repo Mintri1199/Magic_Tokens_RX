@@ -39,16 +39,13 @@ class Router<EndPoint: EndPointType>: NetworkRouter {
             case .request:
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 
-            case .requestParameter(let bodyParameters,
-                                   let urlParameters):
+            case let .requestParameter(bodyParameters, urlParameters):
                 
                 try self.configureParameters(bodyParameters: bodyParameters,
                                              urlParameters: urlParameters,
                                              request: &request)
                 
-            case .requestParametersAndHeaders(let bodyParameters,
-                                              let urlParameters,
-                                              let additionHeaders):
+            case let .requestParametersAndHeaders(bodyParameters, urlParameters, additionHeaders):
                 self.addAdditionalHeaders(additionHeaders, request: &request)
                 try self.configureParameters(bodyParameters: bodyParameters,
                                              urlParameters: urlParameters,
@@ -75,7 +72,9 @@ class Router<EndPoint: EndPointType>: NetworkRouter {
     }
     
     fileprivate func addAdditionalHeaders( _ additionalHeaders: HTTPHeaders?, request: inout URLRequest) {
-        guard let headers = additionalHeaders else { return }
+        guard let headers = additionalHeaders else {
+            return
+        }
         for (key, value) in headers {
             request.setValue(value, forHTTPHeaderField: key)
         }

@@ -17,8 +17,8 @@ class MainScreenViewModel {
         networkManager.getAllSets { (result) in
             switch result {
             case .success(let model):
-                print(model.data.count)
-            
+                model.data.forEach { self.networkManager.getAllCardsFromSet(searchURI: $0.searchURI) }
+                
             case .failure(let error):
                 #if DEBUG
                 print(error)

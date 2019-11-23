@@ -9,9 +9,6 @@
 import Foundation
 import RxSwift
 
-
 class TokenCreationViewModel {
     private let networkManager: NetworkManager = NetworkManager()
-    
-
 }

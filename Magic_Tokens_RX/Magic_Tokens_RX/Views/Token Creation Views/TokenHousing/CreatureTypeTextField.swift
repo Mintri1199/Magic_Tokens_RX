@@ -20,9 +20,9 @@ class CreatureTypeTextField: UITextField {
         font = UIFont(name: "Helvetica", size: 40)
         let attributes = [
             NSAttributedString.Key.foregroundColor: UIColor.lightGray,
-            NSAttributedString.Key.font : UIFont(name: "Helvetica", size: 30)!
+            NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 30)!
         ]
-        attributedPlaceholder = NSAttributedString(string: "Enter Creature Type", attributes:attributes)
+        attributedPlaceholder = NSAttributedString(string: "Enter Creature Type", attributes: attributes)
         minimumFontSize = 14
         adjustsFontSizeToFitWidth = true
         textAlignment = .center

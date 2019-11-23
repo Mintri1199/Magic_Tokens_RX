@@ -10,8 +10,8 @@ import Foundation
 
 public enum ScryfallAPI {
     case sets
-    case picturesInSets
-    case allRelatedCards(name: String, set: String)
+//    case picturesInSets
+//    case allRelatedCards(name: String, set: String)
 }
 
 extension ScryfallAPI: EndPointType {
@@ -21,7 +21,6 @@ extension ScryfallAPI: EndPointType {
         case .production: return "https://api.scryfall.com"
         case .qa: return ""
         case .staging: return ""
-            
         }
     }
     
@@ -33,15 +32,16 @@ extension ScryfallAPI: EndPointType {
     var path: String {
         switch self {
         case .sets: return "/sets"
-        case .picturesInSets: return ""
-        case .allRelatedCards: return "/cards/collection"
+            
+//        case .picturesInSets: return ""
+//        case .allRelatedCards: return "/cards/collection"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .allRelatedCards(name: _, set: _):
-            return .post
+//        case .allRelatedCards(name: _, set: _):
+//            return .post
         default:
             return .get
         }
@@ -51,10 +51,11 @@ extension ScryfallAPI: EndPointType {
         switch self {
         case .sets:
             return .request
-        case .picturesInSets:
-            return .request
-        case .allRelatedCards(name: let name, set: let set):
-            return .requestParameter(bodyParameters: ["identifiers": [["name": name, "set": set]]], urlParameters: nil)
+        
+//        case .picturesInSets:
+//            return .request
+//        case let .allRelatedCards(name: name, set: set):
+//            return .requestParameter(bodyParameters: ["identifiers": [["name": name, "set": set]]], urlParameters: nil)
         }
     }
     

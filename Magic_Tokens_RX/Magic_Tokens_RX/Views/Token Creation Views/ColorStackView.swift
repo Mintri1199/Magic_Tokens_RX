@@ -14,7 +14,6 @@ enum ColorButtonAnimation: String {
     case expandBorder, shrinkBorder
 }
 
-
 class ColorStackView: UIStackView {
     private var selected = 0
     

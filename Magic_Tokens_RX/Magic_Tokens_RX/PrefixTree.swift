@@ -21,10 +21,12 @@ class PrefixTreeNode {
     }
     
     func numberOfChildren() -> Int {
+        // Return the number of non nil children in the array
         return children.reduce(0, { result, child in return child == nil ? result : result + 1})
     }
     
     func hasChild(_ char: Character) -> Bool {
+        // Return a bool to indicate the node has a child or not
         let value = self.charToInt(char)
         if value > 97 || value < 65 {
             return false

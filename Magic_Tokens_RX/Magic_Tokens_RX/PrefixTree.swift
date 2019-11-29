@@ -10,10 +10,19 @@ import Foundation
 
 enum AutoCompleteError: Error {
     case MissingWord
+    case UnableToFindDefaultWeightWord
+    case UnableToFindUserWeightWord
+}
+
+enum AutoCompletePurpose {
+    case allStrings( word: String)
+    case allNodes( node: PrefixTreeNode)
 }
 
 class PrefixTreeNode {
     var data: String?
+    var weight: Int = 0
+    var userWeight: Int?
     var children: [PrefixTreeNode?] = Array(repeating: nil, count: 26)
     
     func isEmpty() -> Bool {
@@ -25,21 +34,23 @@ class PrefixTreeNode {
         return children.reduce(0, { result, child in return child == nil ? result : result + 1 })
     }
     
-    func hasChild(_ char: Character) -> Bool {
-        // Return a bool to indicate the node has a child or not
-        let value = self.charToInt(char)
-        if value > 97 || value < 65 {
+    private func hasChild(_ char: Character) -> Bool {
+        // Return a bool whether the node has a child for the given character
+        if char.isLetter {
+            let value = self.charToInt(char)
+            return self.children[value - 65] != nil
+        } else {
             return false
         }
-        return self.children[value - 65] != nil
     }
     
     func getChild(_ char: Character) -> PrefixTreeNode? {
+        // Return the child node for the given character
         return self.hasChild(char) ? self.children[self.charToInt(char) - 65] : nil
     }
     
     func addChild(_ char: Character, childNode: PrefixTreeNode) {
-        if !self.hasChild(char) {
+        if !self.hasChild(char) && char.isLetter {
             self.children[self.charToInt(char) - 65] = childNode
         }
     }
@@ -56,14 +67,16 @@ class PrefixTreeNode {
 class PrefixTree {
     private let root: PrefixTreeNode = PrefixTreeNode()
     var size: Int = 0
-    init(vocabulary: [String]=[]) {
+    
+    init(vocabulary: [(String, Int)]=[]) {
         for word in vocabulary {
-            self.insert(word: word)
+            self.initialInsert(word: word.0, dataBaseWeight: word.1)
         }
     }
     
-    func insert(word: String) {
-        // Start with the root node
+    private func initialInsert(word: String, dataBaseWeight: Int) {
+        // Insert the given word and weight from the database into the trie initially
+        
         var node = self.root
         
         // Loop through the word character by character
@@ -107,12 +120,23 @@ class PrefixTree {
         }
     }
     
+    func updateUserWeight(word: String) {
+        // Add or update the user weight on the used word
+        if let usedWord = self.findNode(word: word) {
+            if let currentWeight = usedWord.userWeight {
+                usedWord.userWeight = currentWeight + 1
+            } else {
+                usedWord.userWeight = 1
+            }
+        }
+    }
+    
     func findNode(word: String) -> PrefixTreeNode? {
-        // Traverse the tree with the given word and return the end node is it exist
+        // Search the tree with the given word and return the end node is it exist
         var currentNode: PrefixTreeNode = self.root
         
         for char in word.uppercased() {
-            if char == "-" {
+            if !char.isLetter {
                 continue
             }
             if let childrenNode = currentNode.getChild(char) {
@@ -136,8 +160,73 @@ class PrefixTree {
         completion(.failure(.MissingWord))
     }
     
+    func autoCompleteOne(currentString: String, completion: (Result<String, AutoCompleteError>) -> Void) {
+        // Return a complete word based on their database weight or user weight if exist
+        
+        // Find the node of the current String
+        if let currentNode = self.findNode(word: currentString) {
+            
+            var allTerminalNodes: [PrefixTreeNode] = []
+            // Traverse the subtree and gather all terminal nodes
+            self.traversePreOrderForOne(node: currentNode, visit: { allTerminalNodes.append($0) })
+            
+            // Create an array with all the nodes that contains a user weight
+            let userWeightedWords = allTerminalNodes.filter { $0.userWeight != nil }
+            
+            // return the highest weighted string in a closure. Change base whether there are user weighted words are not.
+            if userWeightedWords.isEmpty {
+                if let completedWord = allTerminalNodes.reduce(allTerminalNodes[0] as PrefixTreeNode, { $0.weight < $1.weight ? $1 : $0 }).data {
+                    completion(.success(completedWord))
+                } else {
+                    #if DEBUG
+                    print("Unable to find default weighted word from: \(currentString)")
+                    #endif
+                    completion(.failure(.UnableToFindDefaultWeightWord))
+                }
+            } else {
+                let highestUserWeightNode = userWeightedWords.reduce(userWeightedWords[0]) { (currentNode, value) in
+                    if let weightOne = currentNode.userWeight, let weightTwo = value.userWeight {
+                        return weightOne < weightTwo ? value : currentNode
+                    } else {
+                        #if DEBUG
+                        print("There are something fucky going on")
+                        #endif
+                        return currentNode
+                    }
+                }
+                
+                if let completedWord = highestUserWeightNode.data {
+                    completion(.success(completedWord))
+                } else {
+                    #if DEBUG
+                    print("Unable to find the user weighted word from: \(currentString)")
+                    #endif
+                    completion(.failure(.UnableToFindUserWeightWord))
+                }
+            }
+        } else {
+            #if DEBUG
+            print("Unable to autocomplete from: \(currentString)")
+            #endif
+            completion(.failure(.MissingWord))
+        }
+    }
+    
+    private func traversePreOrderForOne(node: PrefixTreeNode, visit: (PrefixTreeNode) -> Void) {
+        // Traverse the tree pre-order recursively
+        if node.data != nil {
+            visit(node)
+        }
+        
+        for child in node.children {
+            if let child = child {
+                self.traversePreOrderForOne(node: child, visit: visit)
+            }
+        }
+    }
+    
     private func traversePreOrder(node: PrefixTreeNode, visit: (String) -> Void) {
-        // Notes: This is traversing method doesn't use weights
+        // Notes: This is traversing method
         // Traverse the tree pre-order recursively
         
         if let data = node.data {

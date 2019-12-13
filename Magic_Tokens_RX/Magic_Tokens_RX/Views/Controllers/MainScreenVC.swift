@@ -22,7 +22,7 @@ class MainScreenVC: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .gray
         setupNavBar()
-        viewModel.setList()
+        formatJSON()
     }
 }
 

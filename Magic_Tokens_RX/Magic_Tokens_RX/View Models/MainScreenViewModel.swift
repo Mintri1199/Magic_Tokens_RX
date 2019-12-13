@@ -13,6 +13,7 @@ class MainScreenViewModel {
     let colors: [UIColor] = [.gray, .red, .yellow]
     private let networkManager: NetworkManager = NetworkManager()
     
+    
     func setList() {
         networkManager.getAllSets { (result) in
             switch result {

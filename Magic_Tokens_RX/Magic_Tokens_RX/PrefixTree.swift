@@ -65,16 +65,16 @@ class PrefixTreeNode {
 }
 
 class PrefixTree {
-    private let root: PrefixTreeNode = PrefixTreeNode()
+    let root: PrefixTreeNode = PrefixTreeNode()
     var size: Int = 0
     
     init(vocabulary: [(String, Int)]=[]) {
         for word in vocabulary {
-            self.initialInsert(word: word.0, dataBaseWeight: word.1)
+            self.insert(word: word.0, dataBaseWeight: word.1)
         }
     }
     
-    private func initialInsert(word: String, dataBaseWeight: Int) {
+    func insert(word: String, dataBaseWeight: Int) {
         // Insert the given word and weight from the database into the trie initially
         
         var node = self.root
@@ -98,8 +98,10 @@ class PrefixTree {
             }
         }
         
-        if node.data == nil {
+        if node.data == nil && node.weight == 0 {
             node.data = word
+            node.weight = dataBaseWeight
+            self.size += 1
         }
     }
     
@@ -133,6 +135,8 @@ class PrefixTree {
     
     func findNode(word: String) -> PrefixTreeNode? {
         // Search the tree with the given word and return the end node is it exist
+        // Note: the return node does not have to be the terminal node
+        
         var currentNode: PrefixTreeNode = self.root
         
         for char in word.uppercased() {
@@ -148,7 +152,7 @@ class PrefixTree {
         return currentNode
     }
     
-    func autoCompleteAll(word: String, completion: @escaping (Result<[String], AutoCompleteError>) -> Void) {
+    func autoCompleteAll(word: String="", completion: @escaping (Result<[String], AutoCompleteError>) -> Void) {
         if let currentNode = self.findNode(word: word) {
             var result: [String] = []
             
@@ -186,6 +190,7 @@ class PrefixTree {
             } else {
                 let highestUserWeightNode = userWeightedWords.reduce(userWeightedWords[0]) { (currentNode, value) in
                     if let weightOne = currentNode.userWeight, let weightTwo = value.userWeight {
+                        
                         return weightOne < weightTwo ? value : currentNode
                     } else {
                         #if DEBUG
@@ -240,3 +245,4 @@ class PrefixTree {
         }
     }
 }
+
